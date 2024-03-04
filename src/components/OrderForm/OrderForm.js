@@ -1,18 +1,33 @@
 import { useState } from "react";
 
-function OrderForm(props) {
+function OrderForm({ addOrder }) {
   const [name, setName] = useState("");
   const [ingredients, setIngredients] = useState([]);
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (ingredients.length === 0) {
+      alert("Please select at least one ingredient!");
+      return;
+    }
+    if (name.trim() === "") {
+      alert("Please enter a name!");
+      return;
+    }
+    const newOrder = {
+      id: Date.now(),
+      name: name,
+      ingredients: ingredients,
+    };
+
+    addOrder(newOrder);
     clearInputs();
   }
 
   function clearInputs() {
     setName("");
     setIngredients([]);
-  };
+  }
 
   const possibleIngredients = [
     "beans",
@@ -28,12 +43,24 @@ function OrderForm(props) {
     "cilantro",
     "sour cream",
   ];
+
+  const handleInputChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleIngredientClick = (ingredient) => {
+    setIngredients((prevIngredients) => [...prevIngredients, ingredient]);
+  };
+  console.log("ingredients: ", ingredients);
+
   const ingredientButtons = possibleIngredients.map((ingredient) => {
     return (
       <button
+        type="button"
         key={ingredient}
         name={ingredient}
-        // onClick={(e) => }
+        className={ingredient + '-btn'}
+        onClick={() => handleIngredientClick(ingredient)}
       >
         {ingredient}
       </button>
@@ -43,18 +70,21 @@ function OrderForm(props) {
   return (
     <form>
       <input
+      className="form-name"
         type="text"
         placeholder="Name"
         name="name"
         value={name}
-        // onChange={(e) => }
+        onChange={handleInputChange}
       />
 
       {ingredientButtons}
 
       <p>Order: {ingredients.join(", ") || "Nothing selected"}</p>
 
-      <button onClick={(e) => handleSubmit(e)}>Submit Order</button>
+      <button type="submit" className='submit-btn' onClick={handleSubmit} disabled={ingredients.length === 0}>
+        Submit Order
+      </button>
     </form>
   );
 }
